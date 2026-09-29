@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import snailPayRoutes from "./routes/snailPayroutes.js";
+import snailPayRoutes from "./routes/snailPayRoutes.js";
 
 const app = express();
 const PORT = 3000;

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createSnailPayTransaction } from "../controllers/snailPaycontroller.js";
+import { createSnailPayTransaction } from "../controllers/snailPayController.js";
 
 const router = Router();
 
