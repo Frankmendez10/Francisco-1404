@@ -78,71 +78,80 @@ function RegisterPage() {
     }
   }
 
-  return (
-    <main>
-      <section>
+    return (
+    <div className="auth-card">
+      <div className="auth-card-header">
+        <p className="eyebrow">NUEVA CUENTA</p>
         <h1>Crear cuenta</h1>
-        <p>Regístrate para comenzar a participar.</p>
+        <p>
+          Regístrate para comenzar a participar en las carreras.
+        </p>
+      </div>
 
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="fullName">Nombre completo</label>
-            <input
-              id="fullName"
-              name="fullName"
-              type="text"
-              value={formData.fullName}
-              onChange={handleChange}
-              autoComplete="name"
-            />
-          </div>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="fullName">Nombre completo</label>
+          <input
+            id="fullName"
+            name="fullName"
+            type="text"
+            value={formData.fullName}
+            onChange={handleChange}
+            autoComplete="name"
+            placeholder="Tu nombre completo"
+          />
+        </div>
 
-          <div>
-            <label htmlFor="email">Correo electrónico</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              autoComplete="email"
-            />
-          </div>
+        <div>
+          <label htmlFor="email">Correo electrónico</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            autoComplete="email"
+            placeholder="correo@ejemplo.com"
+          />
+        </div>
 
-          <div>
-            <label htmlFor="password">Contraseña</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              autoComplete="new-password"
-            />
-          </div>
+        <div>
+          <label htmlFor="password">Contraseña</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            autoComplete="new-password"
+            placeholder="Mínimo 8 caracteres"
+          />
+        </div>
 
-          <div>
-            <label htmlFor="confirmPassword">
-              Confirmar contraseña
-            </label>
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              autoComplete="new-password"
-            />
-          </div>
+        <div>
+          <label htmlFor="confirmPassword">
+            Confirmar contraseña
+          </label>
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            autoComplete="new-password"
+            placeholder="Repite tu contraseña"
+          />
+        </div>
 
-          {error && <p role="alert">{error}</p>}
+        {error && <p role="alert">{error}</p>}
 
-          {success && <p role="status">{success}</p>}
+        {success && <p role="status">{success}</p>}
 
-          <button type="submit">Crear cuenta</button>
-        </form>
-      </section>
-    </main>
+        <button type="submit">
+          Crear cuenta
+        </button>
+      </form>
+    </div>
   );
 }
 

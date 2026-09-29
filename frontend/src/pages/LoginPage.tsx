@@ -36,41 +36,58 @@ function LoginPage({ onLogin }: LoginPageProps) {
     }
   }
 
-  return (
-    <main>
-      <section>
+    return (
+    <div className="auth-card login-card">
+      <div className="auth-card-header">
+        <p className="eyebrow">ACCESO</p>
         <h1>Iniciar sesión</h1>
-        <p>Ingresa a tu cuenta.</p>
+        <p>
+          Ingresa a tu cuenta para consultar tu dashboard.
+        </p>
+      </div>
 
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="login-email">Correo electrónico</label>
-            <input
-              id="login-email"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.currentTarget.value)}
-              autoComplete="email"
-            />
-          </div>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="login-email">
+            Correo electrónico
+          </label>
 
-          <div>
-            <label htmlFor="login-password">Contraseña</label>
-            <input
-              id="login-password"
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.currentTarget.value)}
-              autoComplete="current-password"
-            />
-          </div>
+          <input
+            id="login-email"
+            type="email"
+            value={email}
+            onChange={(event) =>
+              setEmail(event.currentTarget.value)
+            }
+            autoComplete="email"
+            placeholder="correo@ejemplo.com"
+          />
+        </div>
 
-          {error && <p role="alert">{error}</p>}
+        <div>
+          <label htmlFor="login-password">
+            Contraseña
+          </label>
 
-          <button type="submit">Iniciar sesión</button>
-        </form>
-      </section>
-    </main>
+          <input
+            id="login-password"
+            type="password"
+            value={password}
+            onChange={(event) =>
+              setPassword(event.currentTarget.value)
+            }
+            autoComplete="current-password"
+            placeholder="Tu contraseña"
+          />
+        </div>
+
+        {error && <p role="alert">{error}</p>}
+
+        <button type="submit">
+          Iniciar sesión
+        </button>
+      </form>
+    </div>
   );
 }
 

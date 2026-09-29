@@ -26,12 +26,29 @@ function App() {
   }
 
   return (
-    <div>
-      <RegisterPage />
+    <div className="auth-layout">
+      <section className="auth-brand">
+        <div className="brand-icon">🐌</div>
 
-      <hr />
+        <p className="eyebrow">SIMULADOR DE CARRERAS</p>
 
-      <LoginPage onLogin={handleLogin} />
+        <h1>Carrera de Caracoles</h1>
+
+        <p>
+          Administra tu saldo, consulta las carreras del día y
+          sigue el desempeño de tus caracoles favoritos.
+        </p>
+      </section>
+
+      <section className="auth-panel">
+        <RegisterPage />
+
+        <div className="auth-divider">
+          <span>¿Ya tienes una cuenta?</span>
+        </div>
+
+        <LoginPage onLogin={handleLogin} />
+      </section>
     </div>
   );
 }
