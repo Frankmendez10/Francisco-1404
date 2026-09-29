@@ -4,6 +4,7 @@ import { updateUserBalance } from "../utils/auth";
 import { races, snails } from "../utils/raceData";
 import RaceStats from "../components/RaceStats";
 import PaymentForm from "../components/PaymentForm";
+import { bets } from "../utils/betData";
 
 interface DashboardPageProps {
   user: User;
@@ -12,7 +13,8 @@ interface DashboardPageProps {
 
 function DashboardPage({ user, onLogout, }: DashboardPageProps) {
   const [currentUser, setCurrentUser] = useState(user);
-
+  const wonBets = bets.filter((bet) => bet.won).length;
+  const lostBets = bets.filter((bet) => !bet.won).length;
   const victories = useMemo(() => {
     return snails.map((snail) => ({
       name: snail.name,
@@ -54,7 +56,7 @@ function DashboardPage({ user, onLogout, }: DashboardPageProps) {
         onPaymentSuccess={handlePaymentSuccess}
       />
 
-      <RaceStats wonBets={0} lostBets={0} />
+      <RaceStats wonBets={wonBets} lostBets={lostBets}/>
 
       <section>
         <h2>Victorias por caracol</h2>
