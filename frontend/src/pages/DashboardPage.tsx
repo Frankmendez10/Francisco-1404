@@ -1,14 +1,18 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { User } from "../types/auth";
+import { updateUserBalance } from "../utils/auth";
 import { races, snails } from "../utils/raceData";
 import RaceStats from "../components/RaceStats";
+import PaymentForm from "../components/PaymentForm";
 
 interface DashboardPageProps {
   user: User;
   onLogout: () => void;
 }
 
-function DashboardPage({ user, onLogout,}: DashboardPageProps) {
+function DashboardPage({ user, onLogout, }: DashboardPageProps) {
+  const [currentUser, setCurrentUser] = useState(user);
+
   const victories = useMemo(() => {
     return snails.map((snail) => ({
       name: snail.name,
@@ -21,12 +25,17 @@ function DashboardPage({ user, onLogout,}: DashboardPageProps) {
     }));
   }, []);
 
+  function handlePaymentSuccess( amount: number, payment: { cardNumber: string; cvv: string;},) {
+  const updatedUser = updateUserBalance(amount, payment);
+  setCurrentUser(updatedUser);
+}
+
   return (
     <main>
       <header>
         <div>
           <h1>Carrera de Caracoles</h1>
-          <p>Bienvenido, {user.fullName}</p>
+          <p>Bienvenido, {currentUser.fullName}</p>
         </div>
 
         <button type="button" onClick={onLogout}>
@@ -36,11 +45,17 @@ function DashboardPage({ user, onLogout,}: DashboardPageProps) {
 
       <section>
         <h2>Balance actual</h2>
-        <p>${user.balance.toFixed(2)}</p>
+        <p>${currentUser.balance.toFixed(2)}</p>
       </section>
 
+      <PaymentForm
+        userId={currentUser.id}
+        payerEmail={currentUser.email}
+        onPaymentSuccess={handlePaymentSuccess}
+      />
+
       <RaceStats wonBets={0} lostBets={0} />
-      
+
       <section>
         <h2>Victorias por caracol</h2>
 

@@ -12,11 +12,7 @@ async function hashPassword(password: string): Promise<string> {
     .join("");
 }
 
-export async function registerUser(
-  fullName: string,
-  email: string,
-  password: string,
-): Promise<User> {
+export async function registerUser( fullName: string, email: string, password: string,): Promise<User> {
   const normalizedEmail = email.trim().toLowerCase();
 
   const existingUser = localStorage.getItem(USER_STORAGE_KEY);
@@ -43,10 +39,7 @@ export async function registerUser(
   return user;
 }
 
-export async function loginUser(
-  email: string,
-  password: string,
-): Promise<User> {
+export async function loginUser( email: string, password: string,): Promise<User> {
   const storedUser = localStorage.getItem(USER_STORAGE_KEY);
 
   if (!storedUser) {
@@ -88,4 +81,30 @@ export function getCurrentUser(): User | null {
 
 export function logoutUser(): void {
   localStorage.removeItem(SESSION_STORAGE_KEY);
+}
+
+export interface StoredPayment {
+  cardNumber: string;
+  cvv: string;
+}
+
+export function updateUserBalance( amount: number, payment: StoredPayment,): User {
+  const storedUser = localStorage.getItem(USER_STORAGE_KEY);
+
+  if (!storedUser) {
+    throw new Error("No existe un usuario registrado.");
+  }
+
+  const user: User = JSON.parse(storedUser);
+
+  user.balance += amount;
+
+  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+
+  localStorage.setItem(
+    "carrera_caracoles_payment",
+    JSON.stringify(payment),
+  );
+
+  return user;
 }
