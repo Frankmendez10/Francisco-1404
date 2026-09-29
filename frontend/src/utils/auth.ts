@@ -42,3 +42,50 @@ export async function registerUser(
 
   return user;
 }
+
+export async function loginUser(
+  email: string,
+  password: string,
+): Promise<User> {
+  const storedUser = localStorage.getItem(USER_STORAGE_KEY);
+
+  if (!storedUser) {
+    throw new Error("No existe un usuario registrado.");
+  }
+
+  const user: User = JSON.parse(storedUser);
+  const normalizedEmail = email.trim().toLowerCase();
+  const passwordHash = await hashPassword(password);
+
+  if (
+    user.email !== normalizedEmail ||
+    user.passwordHash !== passwordHash
+  ) {
+    throw new Error("Correo o contraseña incorrectos.");
+  }
+
+  localStorage.setItem(SESSION_STORAGE_KEY, user.id);
+
+  return user;
+}
+
+export function getCurrentUser(): User | null {
+  const storedUser = localStorage.getItem(USER_STORAGE_KEY);
+  const sessionId = localStorage.getItem(SESSION_STORAGE_KEY);
+
+  if (!storedUser || !sessionId) {
+    return null;
+  }
+
+  const user: User = JSON.parse(storedUser);
+
+  if (user.id !== sessionId) {
+    return null;
+  }
+
+  return user;
+}
+
+export function logoutUser(): void {
+  localStorage.removeItem(SESSION_STORAGE_KEY);
+}
