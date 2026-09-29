@@ -10,9 +10,7 @@ function LoginPage({ onLogin }: LoginPageProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  async function handleSubmit(event: {
-    preventDefault: () => void;
-  }) {
+  async function handleSubmit(event: { preventDefault: () => void; }) {
     event.preventDefault();
     setError("");
 

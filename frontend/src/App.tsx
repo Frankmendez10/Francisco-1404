@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import { getCurrentUser, logoutUser } from "./utils/auth";
@@ -15,28 +16,23 @@ function App() {
     setUser(null);
   }
 
-  if (!user) {
+  if (user) {
     return (
-      <div>
-        <RegisterPage />
-
-        <hr />
-
-        <LoginPage onLogin={handleLogin} />
-      </div>
+      <DashboardPage
+        user={user}
+        onLogout={handleLogout}
+      />
     );
   }
 
   return (
-    <main>
-      <h1>Bienvenido, {user.fullName}</h1>
-      <p>Correo: {user.email}</p>
-      <p>Balance: ${user.balance.toFixed(2)}</p>
+    <div>
+      <RegisterPage />
 
-      <button type="button" onClick={handleLogout}>
-        Cerrar sesión
-      </button>
-    </main>
+      <hr />
+
+      <LoginPage onLogin={handleLogin} />
+    </div>
   );
 }
 

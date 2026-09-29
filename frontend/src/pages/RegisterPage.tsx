@@ -27,9 +27,7 @@ function RegisterPage() {
     setSuccess("");
   }
 
-  async function handleSubmit(event: {
-    preventDefault: () => void;
-  }) {
+  async function handleSubmit(event: { preventDefault: () => void;}) {
     event.preventDefault();
 
     const fullName = formData.fullName.trim();
