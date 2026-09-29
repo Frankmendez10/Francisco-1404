@@ -811,3 +811,30 @@ button:disabled {
     padding: 24px;
   }
 }
+
+.auth-switch {
+  max-width: 460px;
+  margin: 24px auto 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.auth-switch button {
+  width: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #4f46e5;
+  font-weight: 700;
+}
+
+.auth-switch button:hover {
+  background: transparent;
+  color: #4338ca;
+  text-decoration: underline;
+}

@@ -2,7 +2,12 @@ import { useState } from "react";
 import type { RegisterFormData } from "../types/auth";
 import { registerUser } from "../utils/auth";
 
-function RegisterPage() {
+
+interface RegisterPageProps {
+  onRegister: () => void;
+}
+
+function RegisterPage({ onRegister }: RegisterPageProps) {
   const [formData, setFormData] = useState<RegisterFormData>({
     fullName: "",
     email: "",
@@ -59,6 +64,7 @@ function RegisterPage() {
     }
 
     try {
+      onRegister();
       await registerUser(fullName, email, formData.password);
 
       setSuccess("Registro exitoso. Tu cuenta está lista para usar.");

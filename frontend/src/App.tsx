@@ -6,14 +6,20 @@ import { getCurrentUser, logoutUser } from "./utils/auth";
 
 function App() {
   const [user, setUser] = useState(getCurrentUser);
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
 
   function handleLogin() {
+    setUser(getCurrentUser());
+  }
+
+  function handleRegister() {
     setUser(getCurrentUser());
   }
 
   function handleLogout() {
     logoutUser();
     setUser(null);
+    setAuthMode("login");
   }
 
   if (user) {
@@ -41,13 +47,35 @@ function App() {
       </section>
 
       <section className="auth-panel">
-        <RegisterPage />
+        {authMode === "login" ? (
+          <>
+            <LoginPage onLogin={handleLogin} />
 
-        <div className="auth-divider">
-          <span>¿Ya tienes una cuenta?</span>
-        </div>
+            <div className="auth-switch">
+              <span>¿No tienes una cuenta?</span>
+              <button
+                type="button"
+                onClick={() => setAuthMode("register")}
+              >
+                Crear cuenta
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <RegisterPage onRegister={handleRegister} />
 
-        <LoginPage onLogin={handleLogin} />
+            <div className="auth-switch">
+              <span>¿Ya tienes una cuenta?</span>
+              <button
+                type="button"
+                onClick={() => setAuthMode("login")}
+              >
+                Iniciar sesión
+              </button>
+            </div>
+          </>
+        )}
       </section>
     </div>
   );
