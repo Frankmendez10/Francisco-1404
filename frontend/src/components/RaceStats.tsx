@@ -24,8 +24,6 @@ function RaceStats({ wonBets, lostBets }: RaceStatsProps) {
 
   return (
     <section>
-      <h2>Estadísticas</h2>
-
       <div>
         <article>
           <h3>Apuestas ganadas y perdidas</h3>
@@ -56,7 +54,7 @@ function RaceStats({ wonBets, lostBets }: RaceStatsProps) {
         </article>
 
         <article>
-          <h3>Victorias por caracol</h3>
+          <h3>Desempeño por caracol</h3>
 
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={snailVictories}>

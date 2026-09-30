@@ -80,7 +80,12 @@ export async function createSnailPayTransaction( req: Request, res: Response,): 
     return;
   }
 
-  const response = processSnailPayTransaction(req.body);
+  const response = await processSnailPayTransaction(req.body);
 
-  res.status(200).json(response);
+    if (response.status === "error") {
+      res.status(503).json(response);
+      return;
+    }
+
+    res.status(200).json(response);
 }

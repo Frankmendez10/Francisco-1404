@@ -65,6 +65,31 @@ function PaymentForm({ userId, payerEmail, onPaymentSuccess,}: PaymentFormProps)
       return;
     }
 
+    if (!/^\d{16}$/.test(formData.cardNumber.trim())) {
+      setError("El número de tarjeta debe contener 16 dígitos.");
+      return;
+    }
+
+    const expiry = formData.expiry.trim();
+    const [month, year] = expiry.split("/");
+
+    if (
+      expiry.length !== 5 ||
+      expiry[2] !== "/" ||
+      !/^\d{2}$/.test(month) ||
+      !/^\d{2}$/.test(year) ||
+      Number(month) < 1 ||
+      Number(month) > 12
+    ) {
+      setError("La fecha de vencimiento debe tener el formato MM/YY.");
+      return;
+    }
+
+    if (!/^\d{3}$/.test(formData.cvv.trim())) {
+      setError("El CVV debe contener 3 dígitos.");
+      return;
+    }
+
     if (formData.amount <= 0) {
       setError("El monto debe ser mayor a cero.");
       return;

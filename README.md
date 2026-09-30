@@ -27,6 +27,7 @@ El proyecto está dividido en dos aplicaciones independientes:
 
 ```text
 carrera_caracoles/
+
 ├── frontend/
 │   └── React + TypeScript
 │
@@ -225,6 +226,7 @@ SNAILPAY_FORCE_ERROR=true
 Con esta variable activa, cualquier transacción procesada por SnailPay devuelve:
 
 ```text
+HTTP 503
 status: error
 ```
 
@@ -295,9 +297,14 @@ La aplicación contempla:
 * Nombre del titular vacío.
 * Monto inválido.
 * Error interno simulado.
+* Error global del sistema.
 * Timeout de la solicitud.
 
 Las solicitudes con datos inválidos reciben HTTP 400 y mantienen una estructura de respuesta consistente de SnailPay, incluyendo identificador, estado, detalle, monto, fecha, referencia y datos del pagador.
+
+Los errores internos del sistema reciben HTTP 503.
+
+Los escenarios de timeout reciben HTTP 504.
 
 Las respuestas de SnailPay mantienen una estructura consistente para operaciones aprobadas, rechazadas, errores internos, timeouts y solicitudes inválidas. Incluyen información como:
 
@@ -316,7 +323,13 @@ Los errores de procesamiento no incrementan el saldo del usuario.
 
 ## Pruebas
 
-El backend cuenta con pruebas unitarias utilizando Vitest.
+El backend cuenta con pruebas automatizadas utilizando Vitest.
+
+Actualmente se incluyen:
+
+* 9 pruebas del servicio SnailPay.
+* 2 pruebas del controller SnailPay.
+* 11 pruebas automatizadas en total.
 
 Para ejecutar las pruebas:
 
@@ -338,7 +351,7 @@ cd frontend
 npm run build
 ```
 
-Además de las pruebas unitarias, se realizaron verificaciones manuales de:
+Además de las pruebas automatizadas, se realizaron verificaciones manuales de:
 
 * Registro e inicio de sesión.
 * Persistencia de sesión después de recargar.
@@ -351,6 +364,9 @@ Además de las pruebas unitarias, se realizaron verificaciones manuales de:
 * Respuesta HTTP 504 del backend.
 * Solicitudes inválidas con respuesta HTTP 400.
 * Persistencia del saldo después de un pago aprobado.
+* Validación de formato de tarjeta.
+* Validación de vencimiento.
+* Validación de CVV.
 
 ## Uso de herramientas de IA
 
@@ -369,6 +385,7 @@ El código generado o sugerido fue revisado, adaptado y probado manualmente dura
 
 ```text
 carrera_caracoles/
+
 │
 ├── backend/
 │   ├── src/
@@ -389,3 +406,9 @@ carrera_caracoles/
 ├── .gitignore
 └── README.md
 ```
+
+## Repositorio
+
+Repositorio público:
+
+github.com/Frankmendez10/Francisco-1404
