@@ -25,7 +25,12 @@ export async function createSnailPayTransaction( payment: PaymentFormData, userI
     });
 
     if (!response.ok) {
-      throw new Error("No fue posible comunicarse con SnailPay.");
+      const errorResponse = (await response.json()) as SnailPayResponse;
+
+      throw new Error(
+        errorResponse.status_detail ||
+          "No fue posible comunicarse con SnailPay.",
+      );
     }
 
     return (await response.json()) as SnailPayResponse;

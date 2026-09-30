@@ -3,6 +3,7 @@ export interface User {
   fullName: string;
   email: string;
   passwordHash: string;
+  passwordSalt: string;
   balance: number;
 }
 

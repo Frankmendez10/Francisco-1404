@@ -116,9 +116,11 @@ La aplicación permite:
 
 La aplicación utiliza LocalStorage debido a que se trata de una simulación local.
 
-Las contraseñas no se almacenan en texto plano. Antes de guardar los datos del usuario se genera un hash SHA-256 utilizando la Web Crypto API.
+Las contraseñas no se almacenan en texto plano. Antes de guardar los datos del usuario se genera un hash mediante PBKDF2 con SHA-256, utilizando un salt aleatorio por usuario y la Web Crypto API.
 
-> Este mecanismo está diseñado para el alcance del challenge y no pretende sustituir un sistema de autenticación de producción con almacenamiento y hash de contraseñas del lado del servidor.
+La simulación mantiene un único usuario local por navegador. Registrar un nuevo usuario reemplaza la cuenta local anterior, ya que el alcance del challenge no requiere múltiples usuarios ni un backend de autenticación persistente.
+
+> Este mecanismo está diseñado para el alcance del challenge y no pretende sustituir un sistema de autenticación de producción. En un entorno real, la autenticación y el almacenamiento de credenciales deberían gestionarse del lado del servidor utilizando mecanismos como Argon2, scrypt o bcrypt.
 
 ## Dashboard
 
@@ -212,6 +214,37 @@ status: error
 
 El saldo no se modifica.
 
+### Error global del sistema
+
+El backend permite forzar un error interno mediante una variable de entorno para facilitar la reproducción y prueba del escenario:
+
+```bash
+SNAILPAY_FORCE_ERROR=true
+```
+
+Con esta variable activa, cualquier transacción procesada por SnailPay devuelve:
+
+```text
+status: error
+```
+
+sin modificar el saldo del usuario.
+
+En PowerShell:
+
+```powershell
+$env:SNAILPAY_FORCE_ERROR="true"
+npm run dev
+```
+
+Para desactivar el escenario:
+
+```powershell
+Remove-Item Env:SNAILPAY_FORCE_ERROR
+```
+
+Después de modificar la variable de entorno, se debe reiniciar el backend.
+
 ### Timeout simulado
 
 Utilizar:
@@ -226,11 +259,13 @@ Monto:         500
 
 El backend retrasa intencionalmente la respuesta durante 11 segundos, mientras que el frontend tiene configurado un timeout de 10 segundos.
 
-Resultado esperado:
+El frontend aborta la solicitud después de 10 segundos y muestra:
 
 ```text
 La solicitud a SnailPay excedió el tiempo de espera. Intenta nuevamente.
 ```
+
+Si se consume directamente el endpoint, el backend responde con HTTP 504 después de los 11 segundos.
 
 El saldo no se modifica.
 
@@ -262,7 +297,9 @@ La aplicación contempla:
 * Error interno simulado.
 * Timeout de la solicitud.
 
-Las respuestas de SnailPay para operaciones procesadas incluyen información como:
+Las solicitudes con datos inválidos reciben HTTP 400 y mantienen una estructura de respuesta consistente de SnailPay, incluyendo identificador, estado, detalle, monto, fecha, referencia y datos del pagador.
+
+Las respuestas de SnailPay mantienen una estructura consistente para operaciones aprobadas, rechazadas, errores internos, timeouts y solicitudes inválidas. Incluyen información como:
 
 * ID de transacción.
 * Estado.
@@ -274,6 +311,8 @@ Las respuestas de SnailPay para operaciones procesadas incluyen información com
 * ID del pagador.
 * Correo del pagador.
 * Datos ficticios de tarjeta utilizados en la simulación.
+
+Los errores de procesamiento no incrementan el saldo del usuario.
 
 ## Pruebas
 
@@ -299,6 +338,20 @@ cd frontend
 npm run build
 ```
 
+Además de las pruebas unitarias, se realizaron verificaciones manuales de:
+
+* Registro e inicio de sesión.
+* Persistencia de sesión después de recargar.
+* Cierre de sesión.
+* Pago aprobado.
+* Pago rechazado.
+* Error interno.
+* Error global mediante `SNAILPAY_FORCE_ERROR`.
+* Timeout del frontend.
+* Respuesta HTTP 504 del backend.
+* Solicitudes inválidas con respuesta HTTP 400.
+* Persistencia del saldo después de un pago aprobado.
+
 ## Uso de herramientas de IA
 
 Durante el desarrollo se utilizaron herramientas de IA como apoyo para:
@@ -310,7 +363,7 @@ Durante el desarrollo se utilizaron herramientas de IA como apoyo para:
 * Apoyar la creación y revisión de pruebas.
 * Analizar posibles mejoras de calidad y seguridad.
 
-El código generado o sugerido fue revisado, adaptado y probado manualmente durante el desarrollo.
+El código generado o sugerido fue revisado, adaptado y probado manualmente durante el desarrollo. Las decisiones finales de implementación fueron verificadas mediante pruebas automatizadas y pruebas manuales.
 
 ## Estructura del proyecto
 

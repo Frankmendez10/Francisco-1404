@@ -3,16 +3,58 @@ import type { User } from "../types/auth";
 const USER_STORAGE_KEY = "carrera_caracoles_user";
 const SESSION_STORAGE_KEY = "carrera_caracoles_session";
 
-async function hashPassword(password: string): Promise<string> {
-  const data = new TextEncoder().encode(password);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+const PBKDF2_ITERATIONS = 100_000;
+const SALT_LENGTH = 16;
 
-  return Array.from(new Uint8Array(hashBuffer))
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes)
     .map((byte) => byte.toString(16).padStart(2, "0"))
     .join("");
 }
 
-export async function registerUser( fullName: string, email: string, password: string,): Promise<User> {
+function hexToBytes(hex: string): Uint8Array {
+  const bytes = new Uint8Array(hex.length / 2);
+
+  for (let index = 0; index < bytes.length; index += 1) {
+    bytes[index] = Number.parseInt(
+      hex.slice(index * 2, index * 2 + 2),
+      16,
+    );
+  }
+
+  return bytes;
+}
+
+async function hashPassword( password: string, salt: Uint8Array,): Promise<string> {
+  const passwordKey = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"],
+  );
+
+  const saltBuffer = salt.buffer.slice( salt.byteOffset, salt.byteOffset + salt.byteLength,) as ArrayBuffer;
+
+  const hashBuffer = await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt: saltBuffer,
+      iterations: PBKDF2_ITERATIONS,
+      hash: "SHA-256",
+    },
+    passwordKey,
+    256,
+  );
+
+  return bytesToHex(new Uint8Array(hashBuffer));
+}
+
+export async function registerUser(
+  fullName: string,
+  email: string,
+  password: string,
+): Promise<User> {
   const normalizedEmail = email.trim().toLowerCase();
 
   const existingUser = localStorage.getItem(USER_STORAGE_KEY);
@@ -25,11 +67,16 @@ export async function registerUser( fullName: string, email: string, password: s
     }
   }
 
+  const salt = crypto.getRandomValues(
+    new Uint8Array(SALT_LENGTH),
+  );
+
   const user: User = {
     id: crypto.randomUUID(),
     fullName: fullName.trim(),
     email: normalizedEmail,
-    passwordHash: await hashPassword(password),
+    passwordHash: await hashPassword(password, salt),
+    passwordSalt: bytesToHex(salt),
     balance: 0,
   };
 
@@ -39,7 +86,10 @@ export async function registerUser( fullName: string, email: string, password: s
   return user;
 }
 
-export async function loginUser( email: string, password: string,): Promise<User> {
+export async function loginUser(
+  email: string,
+  password: string,
+): Promise<User> {
   const storedUser = localStorage.getItem(USER_STORAGE_KEY);
 
   if (!storedUser) {
@@ -48,7 +98,15 @@ export async function loginUser( email: string, password: string,): Promise<User
 
   const user: User = JSON.parse(storedUser);
   const normalizedEmail = email.trim().toLowerCase();
-  const passwordHash = await hashPassword(password);
+
+  if (!user.passwordSalt) {
+    throw new Error(
+      "La cuenta requiere un nuevo registro para actualizar su seguridad.",
+    );
+  }
+
+  const salt = hexToBytes(user.passwordSalt);
+  const passwordHash = await hashPassword(password, salt);
 
   if (
     user.email !== normalizedEmail ||
@@ -88,7 +146,10 @@ export interface StoredPayment {
   cvv: string;
 }
 
-export function updateUserBalance( amount: number, payment: StoredPayment,): User {
+export function updateUserBalance(
+  amount: number,
+  payment: StoredPayment,
+): User {
   const storedUser = localStorage.getItem(USER_STORAGE_KEY);
 
   if (!storedUser) {

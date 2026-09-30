@@ -1,15 +1,4 @@
-import { Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,} from "recharts";
 import { races, snails } from "../utils/raceData";
 
 interface RaceStatsProps {
@@ -49,11 +38,14 @@ function RaceStats({ wonBets, lostBets }: RaceStatsProps) {
                 nameKey="name"
                 cx="50%"
                 cy="50%"
+                innerRadius={60}
                 outerRadius={100}
                 label
               >
                 {betResults.map((entry) => (
-                  <Cell key={entry.name} />
+                  <Cell
+                  key={entry.name}
+                  fill={entry.name === "Ganadas" ? "#22c55e" : "#ef4444"} />
                 ))}
               </Pie>
 

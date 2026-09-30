@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { processSnailPayTransaction } from "../services/snailPayService.js";
-import type { SnailPayRequest } from "../types/snailpay.js";
+import type { SnailPayRequest, SnailPayResponse, } from "../types/snailpay.js";
 
 const TIMEOUT_CARD_NUMBER = "8888888888888888";
 const TIMEOUT_DELAY_MS = 11_000;
@@ -30,22 +30,53 @@ function wait(milliseconds: number): Promise<void> {
   });
 }
 
-export async function createSnailPayTransaction(
-  req: Request,
-  res: Response,
-): Promise<void> {
+function createInvalidRequestResponse( body: unknown,): SnailPayResponse {
+  const request = body && typeof body === "object" ? (body as Record<string, unknown>): {};
+
+  return {
+    id: `txn_invalid_${Date.now()}`,
+    status: "rejected",
+    status_detail: "La solicitud de pago contiene datos inválidos.",
+    transaction_amount: typeof request.amount === "number" && Number.isFinite(request.amount) ? request.amount : 0,
+    date_created: new Date().toISOString(),
+    authorization_code: null,
+    reference: `REF-INVALID-${Date.now()}`,
+    payer_id: typeof request.userId === "string" ? request.userId : "",
+    payer_email: typeof request.payerEmail === "string" ? request.payerEmail : "",
+    card_number: typeof request.cardNumber === "string" ? request.cardNumber : "",
+    cvv: typeof request.cvv === "string" ? request.cvv : "",
+  };
+}
+
+function createTimeoutResponse( request: SnailPayRequest,): SnailPayResponse {
+  return {
+    id: `txn_timeout_${Date.now()}`,
+    status: "error",
+    status_detail:
+      "La solicitud a SnailPay excedió el tiempo de espera.",
+    transaction_amount: request.amount,
+    date_created: new Date().toISOString(),
+    authorization_code: null,
+    reference: `REF-TIMEOUT-${Date.now()}`,
+    payer_id: request.userId,
+    payer_email: request.payerEmail,
+    card_number: request.cardNumber,
+    cvv: request.cvv,
+  };
+}
+
+export async function createSnailPayTransaction( req: Request, res: Response,): Promise<void> {
   if (!isValidSnailPayRequest(req.body)) {
-    res.status(400).json({
-      status: "rejected",
-      status_detail:
-        "La solicitud de pago contiene datos inválidos.",
-    });
+    res.status(400).json(createInvalidRequestResponse(req.body));
 
     return;
   }
 
   if (req.body.cardNumber === TIMEOUT_CARD_NUMBER) {
     await wait(TIMEOUT_DELAY_MS);
+
+    res.status(504).json(createTimeoutResponse(req.body));
+
     return;
   }
 

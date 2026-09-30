@@ -4,6 +4,7 @@ import type { SnailPayRequest, SnailPayResponse,} from "../types/snailpay.js";
 const APPROVED_CARD_NUMBER = "1234123412341234";
 const APPROVED_EXPIRY = "12/26";
 const APPROVED_CVV = "543";
+const FORCE_SYSTEM_ERROR = process.env.SNAILPAY_FORCE_ERROR === "true";
 
 function createBaseResponse( request: SnailPayRequest,): SnailPayResponse {
   return {
@@ -24,7 +25,13 @@ function createBaseResponse( request: SnailPayRequest,): SnailPayResponse {
 export function processSnailPayTransaction( request: SnailPayRequest,): SnailPayResponse {
   const response = createBaseResponse(request);
 
-  // Scenario used to simulate an internal system failure.
+  if (FORCE_SYSTEM_ERROR) {
+    response.status = "error";
+    response.status_detail =
+      "Error interno del sistema de pagos. Intenta nuevamente.";
+    return response;
+  }
+  
   if (request.cardNumber === "9999999999999999") {
     response.status = "error";
     response.status_detail =

@@ -64,8 +64,8 @@ function RegisterPage({ onRegister }: RegisterPageProps) {
     }
 
     try {
-      onRegister();
       await registerUser(fullName, email, formData.password);
+      onRegister();
 
       setSuccess("Registro exitoso. Tu cuenta está lista para usar.");
 
